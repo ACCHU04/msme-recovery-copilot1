@@ -23,29 +23,29 @@
 
 ## Contents
 
-- [The problem](#-the-problem)
-- [What Settle45 does](#-what-settle45-does)
-- [Architecture](#-architecture)
-- [How it works](#-how-it-works)
+- [The problem](#the-problem)
+- [What Settle45 does](#what-settle45-does)
+- [Architecture](#architecture)
+- [How it works](#how-it-works)
   - [1. The recovery journey](#1-the-recovery-journey)
   - [2. Request lifecycle](#2-what-happens-on-one-request)
   - [3. Sign-in and roles](#3-sign-in-and-roles)
   - [4. Buyer confirmation link](#4-buyer-confirmation-no-account-needed)
-- [The legal engine](#-the-legal-engine)
-- [Data model](#-data-model)
-- [Tech stack](#-tech-stack)
-- [Security](#-security)
-- [Project structure](#-project-structure)
-- [Getting started](#-getting-started)
-- [Configuration](#️-configuration)
-- [Database migrations](#-database-migrations)
-- [Testing](#-testing)
-- [Deployment](#-deployment)
-- [Disclaimer](#-disclaimer)
+- [The legal engine](#the-legal-engine)
+- [Data model](#data-model)
+- [Tech stack](#tech-stack)
+- [Security](#security)
+- [Project structure](#project-structure)
+- [Getting started](#getting-started)
+- [Configuration](#configuration)
+- [Database migrations](#database-migrations)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Disclaimer](#disclaimer)
 
 ---
 
-## 🧩 The problem
+## The problem
 
 India's **Micro, Small and Medium Enterprises Development (MSMED) Act, 2006** says a buyer must pay a registered micro or small supplier within **45 days of acceptance** (Section 15). If the buyer is late, the law adds compound interest at **three times the RBI Bank Rate**, with monthly rests (Section 16).
 
@@ -59,32 +59,32 @@ In practice, most small suppliers:
 
 ---
 
-## ✨ What Settle45 does
+## What Settle45 does
 
-| Icon | Feature | What it means for the supplier |
-|:---:|:---|:---|
-| 📄 | **Invoice tracking** | Every invoice with its legal last day to pay, amount owed, payment history, and live status. |
-| ⚖️ | **Legal due date & interest** | Section 15 statutory deadline and Section 16 compound interest calculated by deterministic code — never guessed by AI. |
-| 🧭 | **Next-step engine** | One clear action at a time: Confirm delivery → Gentle reminder → Firm reminder → Legal demand. |
-| ✉️ | **Message drafts** | Ready-to-send notices in English, ಕನ್ನಡ, and हिन्दी with figures filled in by code; open in WhatsApp or your email client. |
-| 🤝 | **Buyer confirmation link** | One-time link the buyer clicks to verify delivery — no account needed; verified receipt becomes admissible evidence. |
-| 🚧 | **Payment blockers** | Track why a buyer is holding payment (missing PO, GRN, GST mismatch, quality check) and draft the fix. |
-| ➗ | **Partial disputes** | Disputed amounts are held separately while undisputed amounts continue to be actively chased. |
-| 📎 | **Evidence vault** | Secure storage for POs, delivery challans, and communications with SHA-256 integrity fingerprints. |
-| 🧾 | **Evidence pack (PDF)** | One-click export of case figures, interest schedules, payment trails, and evidence ready for an adviser or the MSEFC. |
-| 🔳 | **E-invoice QR check** | Decodes signed GST e-invoice QR codes and compares fields directly with your invoice records. |
-| 🔔 | **Daily reminders** | Timely alerts for invoices approaching due dates, promises due or broken — in-app and via Resend email digests. |
-| 📈 | **Cash flow forecast** | 8-week forward cash flow projection showing what is owed now, what is due soon, and who to follow up with first. |
-| 🤖 | **Legal assistant** | Plain-language explanations of the MSMED Act powered by Google Gemini with voice input capability. |
-| 👥 | **Four distinct roles** | Dedicated workflows for MSME Suppliers, Buyers / Enterprises, Advisers (CA/Advocate), and Administrators. |
+| Feature | What it means for the supplier |
+|:---|:---|
+| **Invoice tracking** | Every invoice with its legal last day to pay, amount owed, payment history, and live status. |
+| **Legal due date & interest** | Section 15 statutory deadline and Section 16 compound interest calculated by deterministic code — never guessed by AI. |
+| **Next-step engine** | One clear action at a time: Confirm delivery &rarr; Gentle reminder &rarr; Firm reminder &rarr; Legal demand. |
+| **Message drafts** | Ready-to-send notices in English, Kannada, and Hindi with figures filled in by code; open in WhatsApp or your email client. |
+| **Buyer confirmation link** | One-time link the buyer clicks to verify delivery — no account needed; verified receipt becomes admissible evidence. |
+| **Payment blockers** | Track why a buyer is holding payment (missing PO, GRN, GST mismatch, quality check) and draft the fix. |
+| **Partial disputes** | Disputed amounts are held separately while undisputed amounts continue to be actively chased. |
+| **Evidence vault** | Secure storage for POs, delivery challans, and communications with SHA-256 integrity fingerprints. |
+| **Evidence pack (PDF)** | One-click export of case figures, interest schedules, payment trails, and evidence ready for an adviser or the MSEFC. |
+| **E-invoice QR check** | Decodes signed GST e-invoice QR codes and compares fields directly with your invoice records. |
+| **Daily reminders** | Timely alerts for invoices approaching due dates, promises due or broken — in-app and via Resend email digests. |
+| **Cash flow forecast** | 8-week forward cash flow projection showing what is owed now, what is due soon, and who to follow up with first. |
+| **Legal assistant** | Plain-language explanations of the MSMED Act powered by Google Gemini with voice input capability. |
+| **Four distinct roles** | Dedicated workflows for MSME Suppliers, Buyers / Enterprises, Advisers (CA/Advocate), and Administrators. |
 
 ---
 
-## 🏗 Architecture
+## Architecture
 
 ```mermaid
 flowchart LR
-    U(["👤 User<br/>browser or phone"])
+    U(["User<br/>browser or phone"])
 
     subgraph V["Vercel · Mumbai (bom1)"]
         direction TB
@@ -130,7 +130,7 @@ flowchart LR
 
 ---
 
-## 🔄 How it works
+## How it works
 
 ### 1. The recovery journey
 
@@ -140,7 +140,7 @@ flowchart TD
     B -- "No / unsure" --> B2["Track and remind only<br/>no legal claims in messages"]
     B -- "Yes" --> C["Calculate legal last day to pay<br/>Section 15: max 45 days from acceptance"]
     C --> D{"Paid by due date?"}
-    D -- "Yes" --> Z["✅ Settled"]
+    D -- "Yes" --> Z["Settled"]
     D -- "No" --> E["Section 16 compound interest begins<br/>3 × RBI Bank Rate, compounded monthly"]
     E --> F["Next-step engine selects ONE action"]
     F --> F1["Confirm delivery"]
@@ -228,7 +228,7 @@ sequenceDiagram
 
 ---
 
-## ⚖️ The legal engine
+## The legal engine
 
 All statutory figures are computed by plain, tested Python code in `backend/recovery_engine/` — **AI never calculates interest or due dates**.
 
@@ -245,7 +245,7 @@ All statutory figures are computed by plain, tested Python code in `backend/reco
 
 ---
 
-## 🗃 Data model
+## Data model
 
 ```mermaid
 erDiagram
@@ -313,7 +313,7 @@ erDiagram
 
 ---
 
-## 🛠 Tech stack
+## Tech stack
 
 | Layer | Technology | Why chosen |
 |:---|:---|:---|
@@ -332,7 +332,7 @@ erDiagram
 
 ---
 
-## 🔐 Security
+## Security
 
 - **Row Level Security (RLS)**: Enforced at the Postgres database level across all tables. Suppliers access only their business data; buyers only view invoices billed to them; advisers access only explicitly shared cases.
 - **Zero Client-Side Secrets**: Service-role keys, Resend credentials, and Gemini API keys reside exclusively in the backend runtime.
@@ -344,7 +344,7 @@ erDiagram
 
 ---
 
-## 📁 Project structure
+## Project structure
 
 ```
 msme-recovery-copilot/
@@ -369,7 +369,7 @@ msme-recovery-copilot/
 
 ---
 
-## 🚀 Getting started
+## Getting started
 
 ### Option A — Demo Mode (Quickest, no setup required)
 
@@ -409,7 +409,7 @@ npm run build && npm start     # Visit http://localhost:3000
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 ### Backend (`backend/.env`)
 
@@ -436,7 +436,7 @@ npm run build && npm start     # Visit http://localhost:3000
 
 ---
 
-## 🧱 Database migrations
+## Database migrations
 
 | # | Migration | What it provides |
 |:---:|:---|:---|
@@ -456,7 +456,7 @@ npm run build && npm start     # Visit http://localhost:3000
 
 ---
 
-## 🧪 Testing
+## Testing
 
 Run all automated quality gates with one command:
 
@@ -473,7 +473,7 @@ bash scripts/run_all_checks.sh
 
 ---
 
-## ☁️ Deployment
+## Deployment
 
 ```mermaid
 flowchart LR
@@ -494,7 +494,7 @@ Detailed deployment instructions available in [`docs/DEPLOY.md`](file:///d:/hhhh
 
 ---
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 Settle45 provides statutory calculation estimates for educational and informational purposes under the MSMED Act, 2006. It does not constitute formal legal counsel. Output figures depend strictly upon invoice dates and documentation entered by the user. Kannada and Hindi notices are standardized templates. Consult a qualified professional (Advocate or Chartered Accountant) prior to instituting formal legal proceedings before the Micro and Small Enterprises Facilitation Council (MSEFC).
 
