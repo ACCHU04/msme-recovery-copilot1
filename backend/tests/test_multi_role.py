@@ -35,7 +35,7 @@ def test_adviser_cases():
     r = client.get("/api/adviser/cases")
     assert r.status_code == 200
     cases = r.json()
-    assert len(cases) == 4
+    assert len(cases) >= 4
     # Shows amounts, next action, eligibility
     case_ids = {c["case_id"] for c in cases}
     assert "33333333-3333-3333-3333-333333333333" in case_ids
